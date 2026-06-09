@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mamdani administration personnel tracker</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e2e2e0;
+    --paper: #faf9f6;
+    --card: #ffffff;
+    --green: #1f7a3d;
+    --green-bg: #eaf5ec;
+    --red: #9a2a2a;
+    --red-bg: #f7ece9;
+    --accent: #1a1a1a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+  header.site {
+    padding: 28px 24px 18px;
+    border-bottom: 2px solid var(--ink);
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  h1 {
+    font-size: 30px;
+    margin: 6px 0 8px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .sub { color: var(--muted); font-size: 15px; max-width: 760px; }
+  .meta-row { font-size: 13px; color: var(--muted); margin-top: 10px; }
+  .meta-row b { color: var(--ink); font-weight: 600; }
+  a { color: inherit; }
+
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px 60px; }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-top: 22px;
+  }
+  @media (max-width: 860px) { .columns { grid-template-columns: 1fr; } }
+
+  .feed { min-width: 0; }
+  .feed-head {
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    padding: 12px 0 10px;
+    z-index: 5;
+    border-bottom: 1px solid var(--line);
+  }
+  .feed-title {
+    display: flex; align-items: baseline; gap: 10px;
+    font-size: 18px; font-weight: 700;
+  }
+  .feed-title .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .added .dot { background: var(--green); }
+  .left .dot { background: var(--red); }
+  .feed-title .count {
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    margin-left: auto;
+  }
+  .controls { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  input.search {
+    flex: 1 1 180px;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--card);
+  }
+  select.filter {
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 13px;
+    background: var(--card);
+    color: var(--ink);
+  }
+  .cards { margin-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 15px;
+  }
+  .added .card { border-left: 3px solid var(--green); }
+  .left .card { border-left: 3px solid var(--red); }
+  .card .name { font-size: 16px; font-weight: 700; }
+  .card .title { font-size: 14px; margin-top: 1px; }
+  .card .agency { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .card .row2 { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+  .salary {
+    font-weight: 700; color: var(--green);
+    background: var(--green-bg);
+    padding: 2px 9px; border-radius: 20px; font-size: 13px;
+  }
+  .salary.pending { color: var(--muted); background: #f0efec; font-weight: 600; }
+  .salary.unpaid { color: var(--muted); background: #f0efec; font-weight: 600; }
+  .when { font-size: 12.5px; color: var(--muted); }
+  .reason {
+    font-weight: 700; color: var(--red);
+    background: var(--red-bg);
+    padding: 2px 9px; border-radius: 20px; font-size: 13px;
+  }
+  .tag {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.04em; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 20px; padding: 1px 8px;
+  }
+  .tag.retained { color: #8a6d1a; border-color: #e6d9a8; background: #fbf6e3; }
+  .note { font-size: 12.5px; color: var(--muted); margin-top: 7px; }
+  .note a { color: var(--green); text-decoration: none; }
+  .left .note a { color: var(--red); }
+  .empty { color: var(--muted); font-size: 14px; padding: 20px 4px; }
+
+  footer.method {
+    max-width: 1280px; margin: 0 auto; padding: 24px;
+    border-top: 1px solid var(--line); font-size: 13px; color: var(--muted);
+  }
+  footer.method h3 { font-size: 14px; color: var(--ink); margin: 0 0 6px; }
+  footer.method ul { margin: 6px 0; padding-left: 18px; }
+  footer.method li { margin: 3px 0; }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="kicker">New York City accountability tracker</div>
+  <h1>Who joined and who left the Mamdani administration</h1>
+  <div class="sub">A running list of senior and mid-level political appointees brought into City Hall and the agencies since Jan. 1, 2026, alongside those who have departed. It excludes rank-and-file civil servants such as police officers, firefighters, sanitation workers and public school teachers.</div>
+  <div class="meta-row"><b id="addedCount">0</b> added &nbsp;·&nbsp; <b id="leftCount">0</b> departed &nbsp;·&nbsp; last updated <b id="updated">—</b></div>
+</header>
+
+<div class="wrap">
+  <div class="columns">
+    <section class="feed added" id="addedFeed">
+      <div class="feed-head">
+        <div class="feed-title"><span class="dot"></span> Added <span class="count" id="addedShown"></span></div>
+        <div class="controls">
+          <input class="search" id="addedSearch" placeholder="Search name, title or agency">
+          <select class="filter" id="addedCat"><option value="">All areas</option></select>
+          <select class="filter" id="addedStatus">
+            <option value="">New + retained</option>
+            <option value="new">New appointees only</option>
+            <option value="retained">Retained only</option>
+          </select>
+          <select class="filter" id="addedSort">
+            <option value="date">Newest first</option>
+            <option value="name">Name A–Z</option>
+            <option value="salary">Salary high–low</option>
+          </select>
+        </div>
+      </div>
+      <div class="cards" id="addedCards"></div>
+    </section>
+
+    <section class="feed left" id="leftFeed">
+      <div class="feed-head">
+        <div class="feed-title"><span class="dot"></span> Departed <span class="count" id="leftShown"></span></div>
+        <div class="controls">
+          <input class="search" id="leftSearch" placeholder="Search name, title or agency">
+          <select class="filter" id="leftCat"><option value="">All areas</option></select>
+          <select class="filter" id="leftSort">
+            <option value="date">Most recent first</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </div>
+      </div>
+      <div class="cards" id="leftCards"></div>
+    </section>
+  </div>
+</div>
+
+<footer class="method">
+  <h3>How this list is built</h3>
+  <ul>
+    <li><b>Who is included.</b> Mayoral and agency political appointees in the civil-service exempt class — deputy mayors, commissioners, agency heads, chiefs, senior advisors, press and policy staff, and board appointees. Rank-and-file civil servants are excluded by design.</li>
+    <li><b>Salaries.</b> A green dollar figure is shown only where the city publishes an official base salary for that title (the Quadrennial Advisory Commission's mayoral-appointee schedule). Everyone else is marked "not yet disclosed" until they appear in the Citywide Payroll dataset, which lags by fiscal year. No salary is estimated or invented.</li>
+    <li><b>Dates.</b> Reflect the announcement or confirmation date where reported; "transition" marks hires made during the December 2025 transition before Inauguration Day.</li>
+    <li><b>Sources.</b> Each entry links to a primary or news source. Seeded from the Mayor's Office press releases, City &amp; State New York, FOX 5 and the New York Building Congress administration tracker.</li>
+    <li><b>Status.</b> "Retained" marks officials kept on from the Adams administration rather than newly brought in. The departed column includes Adams-era holdovers who left as the administration changed.</li>
+  </ul>
+  <p>This is a working draft, not an official roster. Corrections and additions welcome.</p>
+</footer>
+
+<script>
+const fmtMoney = n => '$' + n.toLocaleString('en-US');
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtDate(d, note){
+  if(!d) return note || 'Date not specified';
+  const [y,m,day] = d.split('-').map(Number);
+  return months[m-1] + ' ' + day + ', ' + y;
+}
+function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+let DATA = {appointees:[], departed:[], meta:{}};
+
+function salaryChip(p){
+  if(p.salary === 0) return '<span class="salary unpaid">Unpaid (advisory)</span>';
+  if(typeof p.salary === 'number') return '<span class="salary" title="'+esc(p.salaryLabel||'')+'">'+fmtMoney(p.salary)+'</span>';
+  return '<span class="salary pending" title="Will appear in Citywide Payroll on a fiscal-year lag">Salary not yet disclosed</span>';
+}
+
+function addedCard(p){
+  const tag = p.status==='retained' ? '<span class="tag retained">Retained</span>' : '';
+  const note = p.notes ? '<div class="note">'+esc(p.notes)+' <a href="'+esc(p.source)+'" target="_blank" rel="noopener">Source ↗</a></div>'
+                       : '<div class="note"><a href="'+esc(p.source)+'" target="_blank" rel="noopener">Source ↗</a></div>';
+  return '<div class="card">'
+    + '<div class="name">'+esc(p.name)+'</div>'
+    + '<div class="title">'+esc(p.title)+'</div>'
+    + '<div class="agency">'+esc(p.agency)+'</div>'
+    + '<div class="row2">'+salaryChip(p)+'<span class="when">'+fmtDate(p.date,p.dateNote)+'</span>'+tag+'</div>'
+    + note + '</div>';
+}
+function leftCard(p){
+  const note = '<div class="note">'+esc(p.detail||'')+' <a href="'+esc(p.source)+'" target="_blank" rel="noopener">Source ↗</a></div>';
+  const when = p.departDate ? 'Left '+fmtDate(p.departDate) : fmtDate(p.date);
+  return '<div class="card">'
+    + '<div class="name">'+esc(p.name)+'</div>'
+    + '<div class="title">'+esc(p.title)+'</div>'
+    + '<div class="agency">'+esc(p.agency)+'</div>'
+    + '<div class="row2"><span class="reason">'+esc(p.reason)+'</span><span class="when">'+when+'</span></div>'
+    + note + '</div>';
+}
+
+function uniqueCats(list){ return [...new Set(list.map(x=>x.category).filter(Boolean))].sort(); }
+function fillSelect(sel, cats){ cats.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); }); }
+
+function renderAdded(){
+  const q = document.getElementById('addedSearch').value.toLowerCase().trim();
+  const cat = document.getElementById('addedCat').value;
+  const status = document.getElementById('addedStatus').value;
+  const sort = document.getElementById('addedSort').value;
+  let list = DATA.appointees.filter(p=>{
+    if(cat && p.category!==cat) return false;
+    if(status && p.status!==status) return false;
+    if(q){ const hay=(p.name+' '+p.title+' '+p.agency).toLowerCase(); if(!hay.includes(q)) return false; }
+    return true;
+  });
+  list.sort((a,b)=>{
+    if(sort==='name') return a.name.localeCompare(b.name);
+    if(sort==='salary') return (b.salary||-1)-(a.salary||-1);
+    return (b.date||'0').localeCompare(a.date||'0');
+  });
+  const el = document.getElementById('addedCards');
+  el.innerHTML = list.length ? list.map(addedCard).join('') : '<div class="empty">No matches.</div>';
+  document.getElementById('addedShown').textContent = list.length + ' of ' + DATA.appointees.length;
+}
+function renderLeft(){
+  const q = document.getElementById('leftSearch').value.toLowerCase().trim();
+  const cat = document.getElementById('leftCat').value;
+  const sort = document.getElementById('leftSort').value;
+  let list = DATA.departed.filter(p=>{
+    if(cat && p.category!==cat) return false;
+    if(q){ const hay=(p.name+' '+p.title+' '+p.agency).toLowerCase(); if(!hay.includes(q)) return false; }
+    return true;
+  });
+  list.sort((a,b)=>{
+    if(sort==='name') return a.name.localeCompare(b.name);
+    return (b.departDate||b.date||'0').localeCompare(a.departDate||a.date||'0');
+  });
+  const el = document.getElementById('leftCards');
+  el.innerHTML = list.length ? list.map(leftCard).join('') : '<div class="empty">No matches.</div>';
+  document.getElementById('leftShown').textContent = list.length + ' of ' + DATA.departed.length;
+}
+
+fetch('data.json').then(r=>r.json()).then(d=>{
+  DATA = d;
+  document.getElementById('addedCount').textContent = d.appointees.length;
+  document.getElementById('leftCount').textContent = d.departed.length;
+  document.getElementById('updated').textContent = fmtDate(d.meta.lastUpdated);
+  fillSelect(document.getElementById('addedCat'), uniqueCats(d.appointees));
+  fillSelect(document.getElementById('leftCat'), uniqueCats(d.departed));
+  ['addedSearch','addedCat','addedStatus','addedSort'].forEach(id=>document.getElementById(id).addEventListener('input',renderAdded));
+  ['leftSearch','leftCat','leftSort'].forEach(id=>document.getElementById(id).addEventListener('input',renderLeft));
+  renderAdded(); renderLeft();
+}).catch(e=>{
+  document.getElementById('addedCards').innerHTML='<div class="empty">Could not load data.json — run this from a local server (see README).</div>';
+});
+</script>
+</body>
+</html>
