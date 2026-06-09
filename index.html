@@ -141,6 +141,26 @@
   footer.method h3 { font-size: 14px; color: var(--ink); margin: 0 0 6px; }
   footer.method ul { margin: 6px 0; padding-left: 18px; }
   footer.method li { margin: 3px 0; }
+
+  .ai-caution { position: relative; display: inline-block; margin-top: 14px; }
+  .ai-caution button {
+    font: inherit; font-size: 13px; font-weight: 600;
+    color: #fff; background: #7a2018; border: none;
+    padding: 7px 14px; border-radius: 6px; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+  .ai-caution button:hover { background: #6a1813; }
+  .ai-caution .popover {
+    display: none; position: absolute; bottom: calc(100% + 10px); left: 0;
+    width: min(440px, 86vw); background: #1f2a44; color: #eef1f7;
+    padding: 16px 18px; border-radius: 8px; font-size: 13px; line-height: 1.5;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.28); z-index: 50;
+  }
+  .ai-caution.open .popover { display: block; }
+  .ai-caution .popover:after {
+    content: ""; position: absolute; top: 100%; left: 22px;
+    border: 8px solid transparent; border-top-color: #1f2a44;
+  }
 </style>
 </head>
 <body>
@@ -200,7 +220,12 @@
     <li><b>Sources.</b> Each entry links to a primary or news source. Seeded from the Mayor's Office press releases, City &amp; State New York, FOX 5 and the New York Building Congress administration tracker.</li>
     <li><b>Status.</b> "Retained" marks officials kept on from the Adams administration rather than newly brought in. The departed column includes Adams-era holdovers who left as the administration changed.</li>
   </ul>
-  <p>This is a working draft, not an official roster. Corrections and additions welcome.</p>
+  <p>This is a working draft, not an official roster. Corrections and additions welcome &nbsp;
+    <span class="ai-caution" id="aiCaution">
+      <button type="button" aria-expanded="false">And please read this AI caution.</button>
+      <span class="popover">Everything substantive — the concept, the choice of who counts as a political appointee, and the editorial judgment — was handled by the author (a human). The coding and data assembly were primarily in the hands of Anthropic's Claude and Claude Code, under close direction. The author interrogated Claude throughout and insisted on quality controls. Those included sourcing every entry to a named press release or news report (linked on each card); showing a salary figure only where the city officially publishes one for that title, never estimating or inventing a number; and flagging the data's limits in the methodology above. Nevertheless, the risks of using AI remain, and we'd be especially grateful to learn of any red flags, errors or omissions you notice.</span>
+    </span>
+  </p>
 </footer>
 
 <script>
@@ -283,6 +308,19 @@ function renderLeft(){
   el.innerHTML = list.length ? list.map(leftCard).join('') : '<div class="empty">No matches.</div>';
   document.getElementById('leftShown').textContent = list.length + ' of ' + DATA.departed.length;
 }
+
+(function(){
+  const wrap = document.getElementById('aiCaution');
+  const btn = wrap.querySelector('button');
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const open = wrap.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open);
+  });
+  document.addEventListener('click', e=>{
+    if(!wrap.contains(e.target)){ wrap.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+  });
+})();
 
 fetch('data.json').then(r=>r.json()).then(d=>{
   DATA = d;
