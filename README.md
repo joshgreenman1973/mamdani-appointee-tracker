@@ -61,10 +61,10 @@ so nothing unsourced is added. After verifying a release, add a source-linked
 entry to `data.json` and bump `meta.lastUpdated`.
 
 Sources beyond the Mayor's Office to watch: City & State New York's "Who's who"
-roster, Politico New York Playbook, The City, and Gothamist.
+roster, Politico New York Playbook, The City and Gothamist.
 
 ## Seed sources
 
-Mayor's Office press releases (nyc.gov), City & State New York, FOX 5 New York,
+Mayor's Office press releases (nyc.gov), City & State New York, FOX 5 New York
 and the New York Building Congress administration tracker. Each entry links to its
 own source.

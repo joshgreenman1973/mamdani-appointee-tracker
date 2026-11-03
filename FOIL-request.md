@@ -1,6 +1,6 @@
 # FOIL request — full Mamdani-administration appointee roster
 
-**Why this is the unlock.** The mid-level political layer (deputy and assistant
+**Why file this.** The mid-level political layer (deputy and assistant
 commissioners, agency chiefs of staff, general counsels, executive directors,
 senior mayoral advisors, policy and intergovernmental staff) is not published in
 press releases, is absent from the Green Book as machine data, and will not appear
