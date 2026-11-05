@@ -262,7 +262,7 @@ function addedCard(p){
 }
 function leftCard(p){
   const note = '<div class="note">'+esc(p.detail||'')+' <a href="'+esc(p.source)+'" target="_blank" rel="noopener">Source ↗</a></div>';
-  const when = p.departDate ? 'Left '+fmtDate(p.departDate) : fmtDate(p.date);
+  const when = p.departDateNote ? 'Left '+p.departDateNote : p.departDate ? 'Left '+fmtDate(p.departDate) : fmtDate(p.date);
   return '<div class="card">'
     + '<div class="name">'+esc(p.name)+'</div>'
     + '<div class="title">'+esc(p.title)+'</div>'
